@@ -1,4 +1,4 @@
-#Backupchi Script
+Backupchi Script
 
 This Bash script provides a simple backup solution for both local and backup server setups. It includes options for installing and configuring Nginx, scheduling backups, and sending backup files to Telegram. The script also allows for uninstallation.
 
