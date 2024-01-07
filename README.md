@@ -30,6 +30,13 @@ bash <(curl -Ls https://github.com/masoudgb/Backupchi/raw/main/backupchi.sh)
 - The script should be executed with root privileges.
 Supported package managers: apt-get, dnf, yum.
 
+
+**
+
+## Screenshot 
+![توضیح تصویر](https://s31.picofile.com/file/8471294650/backupchi_screen1.jpg)
+
+
 **
 
 ## Main Menu Options
