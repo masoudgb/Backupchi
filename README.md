@@ -6,7 +6,7 @@
 ┗━━━┛┗━━━┛┗━━┛┗┛┗┛┗━━┛┃┏━┛┗━━┛┗┛┗┛┗┛
 ━━━━━━━━━━━━━━━━━━━━━━┃┃━━━━━━━━━━━━
 ━━━━━━━━━━━━━━━━━━━━━━┗┛━━━━━━━━━━━━
-**
+
 
 # Backupchi Script
 
@@ -14,7 +14,7 @@
 
 <!-- The rest of your README content goes here -->
 
-**
+________________________________________________
 
 - This Bash script provides a simple backup solution for both local and backup server setups. It includestrong texts options for installing and configuring Nginx, scheduling backups, and sending backup files to Telegram. The script also allows for uninstallation.
 
@@ -22,27 +22,27 @@
 
 ## Install & Upgrade
 
-**
+___________________________
 
 ```bash
 bash <(curl -Ls https://github.com/masoudgb/Backupchi/raw/main/backupchi.sh)
 ```
 
-**
+___________________________
 
 ## Prerequisites
 
-**
+___________________________
 
 
 - The script should be executed with root privileges.
 Supported package managers: apt-get, dnf, yum.
 
-**
+___________________________
 
 ## Main Menu Options
 
-**
+___________________________
 
  **1. Local server**
 
@@ -60,22 +60,22 @@ Removes the script and optionally deletes the backup directory.
  
 Exits the script.
 
-**
+___________________________
 
 ## Note
 
-**
+___________________________
 
 
 - Ensure to provide necessary inputs as prompted during the execution.
 Special Thanks
 **This script is created by Masoud Gb** with special thanks to Hamid Router
 
-**
+___________________________
 
 ## Disclaimer
 
-**
+___________________________
 
 
 - Use this script at your own risk. The author is not responsible for any data loss or system issues.
