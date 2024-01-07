@@ -18,6 +18,17 @@ Supported package managers: apt-get, dnf, yum.
 
 **
 
+## Install & Upgrade
+
+**
+
+```bash
+bash <(curl -Ls https://github.com/masoudgb/Backupchi/raw/main/backupchi.sh)
+```
+
+
+**
+
 ## Main Menu Options
 
 **
