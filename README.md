@@ -2,7 +2,7 @@
 
 # Backupchi Script
 
-[English](README-en.md) | [فارسی](README-fa.md)
+[English](README.md) | [فارسی](README-fa.md)
 
 <!-- The rest of your README content goes here -->
 
