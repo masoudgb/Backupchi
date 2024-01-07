@@ -35,7 +35,7 @@ Removes the script and optionally deletes the backup directory.
 
 **4. Exit**
  
-5. Exits the script.
+Exits the script.
 
 **
 
