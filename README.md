@@ -42,8 +42,6 @@ ___________________________
 
 ## Main Menu Options
 
-___________________________
-
  **1. Local server**
 
 Configures a local server with Nginx, scheduling backups, and sending them to Telegram if desired.
@@ -64,9 +62,6 @@ ___________________________
 
 ## Note
 
-___________________________
-
-
 - Ensure to provide necessary inputs as prompted during the execution.
 Special Thanks
 **This script is created by Masoud Gb** with special thanks to Hamid Router
@@ -74,8 +69,6 @@ Special Thanks
 ___________________________
 
 ## Disclaimer
-
-___________________________
 
 
 - Use this script at your own risk. The author is not responsible for any data loss or system issues.
