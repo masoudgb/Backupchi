@@ -1,6 +1,6 @@
 
 
-# اسکریپت Backupchi
+# اسکریپت بکاپچی
 
 **
 
@@ -12,9 +12,10 @@
 
 **
 
-`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ` bash bash < ( curl -Ls https://github.com/masoudgb/Backupchi/raw/main/backupchi.sh ) `                                                                                                                                                                                                                                                                                                                                                                                                                                             ` `                                                                                                                                                                                                                                             
- 
-
+`                                                                                               ```bash
+bash <(curl -Ls https://github.com/masoudgb/Backupchi/raw/main/backupchi.sh)
+```
+      
 
 **
 
