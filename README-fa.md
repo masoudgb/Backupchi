@@ -50,7 +50,7 @@ bash <(curl -Ls https://github.com/masoudgb/Backupchi/raw/main/backupchi.sh)
 
 ** 4. خروج **
  
-از فیلمنامه خارج می شود.
+از اسکریپت خارج می شود.
 
 **
 
