@@ -8,16 +8,6 @@
 
 **
 
-## Prerequisites
-
-**
-
-
-- The script should be executed with root privileges.
-Supported package managers: apt-get, dnf, yum.
-
-**
-
 ## Install & Upgrade
 
 **
@@ -26,6 +16,15 @@ Supported package managers: apt-get, dnf, yum.
 bash <(curl -Ls https://github.com/masoudgb/Backupchi/raw/main/backupchi.sh)
 ```
 
+**
+
+## Prerequisites
+
+**
+
+
+- The script should be executed with root privileges.
+Supported package managers: apt-get, dnf, yum.
 
 **
 
