@@ -22,7 +22,7 @@ bash <(curl -Ls https://github.com/masoudgb/Backupchi/raw/main/backupchi.sh)
 **
 
 ## Screenshot 
-![توضیح تصویر](https://s31.picofile.com/file/8471294650/backupchi_screen1.jpg)
+![68747470733a2f2f7333312e7069636f66696c652e636f6d2f66696c652f383437313239343635302f6261636b75706368695f73637265656e312e6a7067](https://github.com/masoudgb/Backupchi/assets/87688187/227d4988-6286-4b78-9e84-538f8beffa10)
 
 **
 
