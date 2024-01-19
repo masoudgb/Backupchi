@@ -1,4 +1,3 @@
-**
 ![Asset 2](https://github.com/masoudgb/Backupchi/assets/87688187/5fc8fdc6-3a11-47f5-9344-8889b2556844)
 
 # Backupchi Script
