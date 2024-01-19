@@ -1,5 +1,6 @@
 
-**
+**![Asset 2](https://github.com/masoudgb/Backupchi/assets/87688187/5b40fddb-0ab8-48c6-8fa2-16cfd84b2ee1)
+
 # اسکریپت Backupchi
 
 [English](README.md) | [فارسی](README-fa.md)
