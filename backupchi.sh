@@ -11,7 +11,7 @@ else
 
     # Update the server and install zip
     if [ -x "$(command -v apt-get)" ]; then
-        apt-get update && apt-get upgrade -y
+        apt-get update
     elif [ -x "$(command -v dnf)" ]; then
         dnf update -y
     elif [ -x "$(command -v yum)" ]; then
