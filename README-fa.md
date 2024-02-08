@@ -1,4 +1,4 @@
-![Asset 1](https://github.com/masoudgb/Backupchi/assets/87688187/343d4c21-a653-4407-96d6-e9fa664162c5)
+![backupchi](https://github.com/masoudgb/Backupchi/assets/87688187/d6315d46-e9bf-4a75-b07d-667d63d11fe5)
 
 
 # اسکریپت Backupchi
