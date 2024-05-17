@@ -106,20 +106,19 @@ echo $'\e[35m'"Backupchi Script v0.1"$'\e[0m'
 
         case $backup_interval_choice in
             1)
-                echo "Enter the minutes: "
-                read -p $'\e[32m'"Enter the interval value: "$'\e[0m' backup_interval_value
+                backup_interval_value=$(read_numeric_input "Enter the minutes: ")
                 cron_interval="*/$backup_interval_value * * * *"
                 ;;
             2)
-                read -p "Enter the hours: " backup_interval_value
+                backup_interval_value=$(read_numeric_input "Enter the hours: ")
                 cron_interval="0 */$backup_interval_value * * *"
                 ;;
             3)
-                read -p "Enter the days: " backup_interval_value
+                backup_interval_value=$(read_numeric_input "Enter the days: ")
                 cron_interval="0 0 */$backup_interval_value * *"
                 ;;
             4)
-                read -p "Enter the weeks: " backup_interval_value
+                backup_interval_value=$(read_numeric_input "Enter the weeks: ")
                 cron_interval="0 0 * * */$backup_interval_value"
                 ;;
             *)
@@ -129,9 +128,9 @@ echo $'\e[35m'"Backupchi Script v0.1"$'\e[0m'
         esac
 
         # Create cron job for backup
-        cron_command="cd $backup_path && zip -r -P $zip_password $backup_filename.zip * && mv $backup_filename.zip /var/www/html/ && chmod 755 /var/www/html/$backup_filename.zip"
+        cron_command="cd $backup_path && zip -r -P $zip_password /tmp/$backup_filename.zip * && mv /tmp/$backup_filename.zip /var/www/html/ && chmod 755 /var/www/html/$backup_filename.zip && rm -f /tmp/$backup_filename.zip"
         cron_job="$cron_interval $cron_command"
-        (crontab -l ; echo "$cron_job") | crontab -
+        add_cron_job "$cron_job"
 
         echo $'\e[32m'"Cron job for backup scheduled successfully."$'\e[0m'
 
@@ -150,145 +149,147 @@ echo $'\e[35m'"Backupchi Script v0.1"$'\e[0m'
 
             # Ask for Telegram chat ID in green
             read -p $'\e[32m'"Enter your Telegram chat ID: "$'\e[0m' telegram_chat_id
-        fi
 
-        # Create cron job for backup and sending to Telegram
-        cron_command="cd $backup_path && zip -r -P $zip_password $backup_filename.zip * && mv $backup_filename.zip /var/www/html/ && chmod 755 /var/www/html/$backup_filename.zip"
-
-        if [ "$send_to_telegram" == "y" ]; then
             # Add Telegram send command to cron job
             telegram_cron_command="curl -s -F chat_id=$telegram_chat_id -F document=@/var/www/html/$backup_filename.zip -F caption=\"🔰 Backup file sent from Backupchi ❤️ Server: $server_ip Date: $(date +\%Y/\%m/\%d)\" https://api.telegram.org/bot$telegram_token/sendDocument"
             cron_command="$cron_command && $telegram_cron_command"
+
+            # Use user-defined backup interval
+            cron_job="* * * * * $cron_command"
+            add_cron_job "$cron_job"
+
+            echo $'\e[32m'"The backup file was sent successfully. Check out the Telegram bot"$'\e[0m'
+            exit 0
+        else
+            echo "Skipping nginx installation."
         fi
-
-        # Use user-defined backup interval
-        cron_job="* * * * * $cron_command"
-        (crontab -l ; echo "$cron_job") | crontab -
-
-        echo $'\e[32m'"The backup file was sent successfully. Check out the Telegram bot"$'\e[0m'
-        exit 0
-    else
-        echo "Skipping nginx installation."
-    fi
-    ;;
+        ;;
 
     2)
-    echo "Setting up a backup server..."
+        echo "Setting up a backup server..."
 
-    # Ask the user for the backup file link
-    read -p $'\e[32m'"Enter the link to the backup file (e.g., http://example.com/backup.zip): "$'\e[0m' backup_link
+        # Ask the user for the backup file link
+        read -p $'\e[32m'"Enter the link to the backup file (e.g., http://example.com/backup.zip): "$'\e[0m' backup_link
 
-    # Extract the filename from the backup link
-    backup_filename=$(basename "$backup_link")
+        # Extract the filename from the backup link
+        backup_filename=$(basename "$backup_link")
 
-    # Set the default backup destination
-    default_backup_destination="/root/backupchi"
-    backup_destination=""
+        # Set the default backup destination
+        default_backup_destination="/root/backupchi"
+        backup_destination=""
 
-    # Ask the user if they want to use the default backup directory
-    read -p $'\e[32m'"Do you want to use the default backup directory ($default_backup_destination)? (y/n): "$'\e[0m' use_default_directory
-    if [ "$use_default_directory" == "y" ] || [ -z "$use_default_directory" ]; then
-        backup_destination="$default_backup_destination"
-    else
-        # Ask the user for the custom backup file destination path
-        read -p $'\e[32m'"Enter the backup file destination path: "$'\e[0m' custom_backup_destination
-        # Update the backup destination if the user provided a custom path
-        backup_destination="$custom_backup_destination"
-    fi
+        # Ask the user if they want to use the default backup directory
+        read -p $'\e[32m'"Do you want to use the default backup directory ($default_backup_destination)? (y/n): "$'\e[0m' use_default_directory
+        if [ "$use_default_directory" == "y" ] || [ -z "$use_default_directory" ]; then
+            backup_destination="$default_backup_destination"
+        else
+            # Ask the user for the custom backup file destination path
+            read -p $'\e[32m'"Enter the backup file destination path: "$'\e[0m' custom_backup_destination
+            # Update the backup destination if the user provided a custom path
+            backup_destination="$custom_backup_destination"
+        fi
 
-    # Create the backup directory if it doesn't exist
-    mkdir -p "$backup_destination"
+        # Create the backup directory if it doesn't exist
+        mkdir -p "$backup_destination"
 
-    # Ask the user for the backup interval
-    echo "Choose backup interval:"
-    echo $'\e[32m'"1. Every few minutes"$'\e[0m'
-    echo $'\e[32m'"2. Every few hours"$'\e[0m'
-    echo $'\e[32m'"3. Every few days"$'\e[0m'
-    echo $'\e[32m'"4. Every few weeks"$'\e[0m'
-    read -p "Enter your choice (1-4): " backup_interval_choice
+        # Ask the user for the backup interval
+        echo "Choose backup interval:"
+        echo $'\e[32m'"1. Every few hours"$'\e[0m'
+        echo $'\e[32m'"2. Every few days"$'\e[0m'
+        echo $'\e[32m'"3. Every few weeks"$'\e[0m'
+        read -p "Enter your choice (1-3): " backup_interval_choice
 
-    case $backup_interval_choice in
-        1)
-            echo "Enter the minutes: "
-            read -p $'\e[32m'"Enter the interval value: "$'\e[0m' backup_interval_value
-            cron_interval="*/$backup_interval_value * * * *"
-            ;;
-        2)
-            read -p "Enter the hours: " backup_interval_value
-            cron_interval="0 */$backup_interval_value * * *"
-            ;;
-        3)
-            read -p "Enter the days: " backup_interval_value
-            cron_interval="0 0 */$backup_interval_value * *"
-            ;;
-        4)
-            read -p "Enter the weeks: " backup_interval_value
-            cron_interval="0 0 * * */$backup_interval_value"
-            ;;
-        *)
-            echo $'\e[31m'"Invalid choice. Exiting..."$'\e[0m'
-            exit 1
-            ;;
-    esac
+        case $backup_interval_choice in
+            1)
+                backup_interval_value=$(read_numeric_input "Enter the hours: ")
+                cron_interval="0 */$backup_interval_value * * *"
+                ;;
+            2)
+                backup_interval_value=$(read_numeric_input "Enter the days: ")
+                cron_interval="0 0 */$backup_interval_value * *"
+                ;;
+            3)
+                backup_interval_value=$(read_numeric_input "Enter the weeks: ")
+                cron_interval="0 0 * * */$backup_interval_value"
+                ;;
+            *)
+                echo $'\e[31m'"Invalid choice. Exiting..."$'\e[0m'
+                exit 1
+                ;;
+        esac
 
-    # Create cron job for backup server
-    cron_command="wget -O $backup_destination/$backup_filename $backup_link"
-    cron_job="$cron_interval $cron_command"
-    (crontab -l ; echo "$cron_job") | crontab -
+        # Create cron job for backup server
+        cron_command="wget -O $backup_destination/$backup_filename $backup_link"
+        cron_job="$cron_interval $cron_command"
+        add_cron_job "$cron_job"
 
-    # Ask the user if they want to schedule another backup link
-    read -p $'\e[32m'"Do you want to schedule another backup link? (y/n): "$'\e[0m' schedule_another
-    if [ "$schedule_another" == "y" ]; then
-        # Repeat the process for scheduling another backup link
-        echo "Setting up another backup server..."
-        # ...
+        # Ask the user if they want to schedule another backup link
+        read -p $'\e[32m'"Do you want to schedule another backup link? (y/n): "$'\e[0m' schedule_another
+        if [ "$schedule_another" == "y" ]; then
+            echo "Setting up another backup server..."
+            # ...
+            echo $'\e[32m'"Backup server setup completed successfully."$'\e[0m'
+        else
+            echo $'\e[32m'"Backup server setup completed successfully."$'\e[0m'
+        fi
+        ;;
 
-        # Continue with other configurations...
+    3)
+        echo "Uninstalling script. Exiting..."
 
-        echo $'\e[32m'"Backup server setup completed successfully."$'\e[0m'
-    else
-        echo $'\e[32m'"Backup server setup completed successfully."$'\e[0m'
-    fi
-   ;;
+        # Check user's confirmation before proceeding to uninstall
+        read -p $'\e[32m'"Are you sure you want to uninstall script ? (y/n): "$'\e[0m' confirm_uninstall
 
-  3)
-echo "Uninstalling script. Exiting..."
+        # Check user's confirmation
+        if [ "$confirm_uninstall" == "y" ]; then
+            # Check user's confirmation before removing the backup directory
+            read -p $'\e[32m'"Do you want to remove the backup folder ? (y/n): "$'\e[0m' confirm_backup_removal
 
-# Check user's confirmation before proceeding to uninstall
-echo -n $'\e[32m'"Are you sure you want to uninstall script ? (y/n): "$'\e[0m'
-read confirm_uninstall
+            # Check user's confirmation
+            if [ "$confirm_backup_removal" == "y" ]; then
+                # Remove backup directory
+                rm -rf "/root/backupchi"
+                echo "Backup directory removed."
+            else
+                echo "Backup directory not removed."
+            fi
+        fi
 
-# Check user's confirmation
-if [ "$confirm_uninstall" == "y" ]; then
-    # Check user's confirmation before removing the backup directory
-    echo -n $'\e[32m'"Do you want to remove the backup folder ? (y/n): "$'\e[0m'
-    read confirm_backup_removal
+        # Remove only cron jobs with .zip extension
+        (crontab -l | grep -v ".zip" ) | crontab -
 
-    # Check user's confirmation
-    if [ "$confirm_backup_removal" == "y" ]; then
-        # Remove backup directory
-        rm -rf "/root/backupchi"
-        echo "Backup directory removed."
-    else
-        echo "Backup directory not removed."
-    fi
-fi
+        echo "Uninstall completed successfully."
+        exit 0
+        ;;
 
-# Remove only cron jobs with .zip extension
-(crontab -l | grep -v ".zip" ) | crontab -
-
-echo "Uninstall completed successfully."
-    exit 0
-    ;;
-
-  4)
-            echo "Exiting..."
-            echo -e "\e[32mGoodbye! Hope to see you again.\e[0m"
-    exit 0
-    ;;
-        *)
-            echo "Invalid choice. Exiting..."
-            exit 1
-            ;;
+    4)
+        echo "Exiting..."
+        echo -e "\e[32mGoodbye! Hope to see you again.\e[0m"
+        exit 0
+        ;;
+    *)
+        echo "Invalid choice. Exiting..."
+        exit 1
+        ;;
     esac
 fi
+
+# Function to add a cron job if not already exists
+add_cron_job() {
+    cron_job="$1"
+    (crontab -l | grep -v "$cron_job" ; echo "$cron_job") | crontab -
+}
+
+# Function to read numeric input
+read_numeric_input() {
+    prompt_message="$1"
+    while true; do
+        read -p "$prompt_message" input
+        if [[ "$input" =~ ^[0-9]+$ ]]; then
+            echo "$input"
+            break
+        else
+            echo "Invalid input. Please enter a numeric value."
+        fi
+    done
+}
