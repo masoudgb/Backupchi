@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# Function to add a cron job if not already exists
+add_cron_job() {
+    cron_job="$1"
+    (crontab -l | grep -v "$cron_job" ; echo "$cron_job") | crontab -
+}
+
+# Function to read numeric input
+read_numeric_input() {
+    prompt_message="$1"
+    while true; do
+        read -p "$prompt_message" input
+        if [[ "$input" =~ ^[0-9]+$ ]]; then
+            echo "$input"
+            break
+        else
+            echo "Invalid input. Please enter a numeric value."
+        fi
+    done
+}
+
 # Ensure script is executable
 chmod +x "$0"
 
@@ -32,7 +52,7 @@ else
         exit 1
     fi
 
-echo $'\e[36m'" ___               _                   ___   _       
+    echo $'\e[36m'" ___               _                   ___   _       
 (  _ \            ( )                 (  _ \( )    _ 
 | (_) )  _ _   ___| |/ ) _   _ _ _    | ( (_) |__ (_)
 |  _ ( / _  )/ ___)   ( ( ) ( )  _ \  | |  _|  _  \ |
@@ -44,7 +64,7 @@ echo $'\e[36m'" ___               _                   ___   _
 
     # Menu for user selection
     echo -e "\e[36mCreated By Masoud Gb Special Thanks Hamid Router\e[0m"
-echo $'\e[35m'"Backupchi Script v0.1"$'\e[0m'
+    echo $'\e[35m'"Backupchi Script v0.1"$'\e[0m'
     echo "Select an option:"
     echo $'\e[32m'"1. Local server"$'\e[0m'
     echo $'\e[32m'"2. Backup server"$'\e[0m'
@@ -55,113 +75,114 @@ echo $'\e[35m'"Backupchi Script v0.1"$'\e[0m'
 
     case $choice in
     1)
-    echo "Setting up a local server..."
+        echo "Setting up a local server..."
 
-    # Install nginx
-    read -p $'\e[32m'"Do you want to install nginx? (y/n): "$'\e[0m' install_nginx
-    if [ "$install_nginx" == "y" ]; then
-        if [ -x "$(command -v apt-get)" ]; then
-            apt-get install -y nginx
-        elif [ -x "$(command -v dnf)" ]; then
-            dnf install -y nginx
-        elif [ -x "$(command -v yum)" ]; then
-            yum install -y nginx
-        else
-            echo $'\e[31m'"Unsupported package manager. Exiting..."$'\e[0m'
-            exit 1
-        fi
-
-        # Ask for backup directory path
-        read -p $'\e[32m'"Enter the backup directory path (default: /etc/x-ui): "$'\e[0m' backup_path
-        backup_path="${backup_path:-/etc/x-ui}"
-        echo "Backup directory path set to: $backup_path"
-
-        # Ask for backup filename
-        read -p $'\e[32m'"Enter the backup filename (default: backup): "$'\e[0m' backup_filename
-        backup_filename="${backup_filename:-backup}"
-
-        # Ask for zip password
-        read -s -p $'\e[32m'"Enter password for the zip file: "$'\e[0m' zip_password
-        echo
-
-        # Confirm zip password
-        read -s -p $'\e[32m'"Confirm password: "$'\e[0m' confirm_zip_password
-        echo
-
-        # Check if passwords match
-        if [ "$zip_password" != "$confirm_zip_password" ]; then
-            echo $'\e[31m'"Passwords do not match. Exiting..."$'\e[0m'
-            exit 1
-        fi
-
-        echo $'\e[32m'"Zip password set successfully."$'\e[0m'
-
-        # Ask for backup interval
-        echo "Choose backup interval:"
-        echo $'\e[32m'"1. Every few minutes"$'\e[0m'
-        echo $'\e[32m'"2. Every few hours"$'\e[0m'
-        echo $'\e[32m'"3. Every few days"$'\e[0m'
-        echo $'\e[32m'"4. Every few weeks"$'\e[0m'
-        read -p "Enter your choice (1-4): " backup_interval_choice
-
-        case $backup_interval_choice in
-            1)
-                backup_interval_value=$(read_numeric_input "Enter the minutes: ")
-                cron_interval="*/$backup_interval_value * * * *"
-                ;;
-            2)
-                backup_interval_value=$(read_numeric_input "Enter the hours: ")
-                cron_interval="0 */$backup_interval_value * * *"
-                ;;
-            3)
-                backup_interval_value=$(read_numeric_input "Enter the days: ")
-                cron_interval="0 0 */$backup_interval_value * *"
-                ;;
-            4)
-                backup_interval_value=$(read_numeric_input "Enter the weeks: ")
-                cron_interval="0 0 * * */$backup_interval_value"
-                ;;
-            *)
-                echo $'\e[31m'"Invalid choice. Exiting..."$'\e[0m'
+        # Install nginx
+        read -p $'\e[32m'"Do you want to install nginx? (y/n): "$'\e[0m' install_nginx
+        if [ "$install_nginx" == "y" ]; then
+            if [ -x "$(command -v apt-get)" ]; then
+                apt-get install -y nginx
+            elif [ -x "$(command -v dnf)" ]; then
+                dnf install -y nginx
+            elif [ -x "$(command -v yum)" ]; then
+                yum install -y nginx
+            else
+                echo $'\e[31m'"Unsupported package manager. Exiting..."$'\e[0m'
                 exit 1
-                ;;
-        esac
+            fi
 
-        # Create cron job for backup
-        cron_command="cd $backup_path && zip -r -P $zip_password /tmp/$backup_filename.zip * && mv /tmp/$backup_filename.zip /var/www/html/ && chmod 755 /var/www/html/$backup_filename.zip && rm -f /tmp/$backup_filename.zip"
-        cron_job="$cron_interval $cron_command"
-        add_cron_job "$cron_job"
+            # Ask for backup directory path
+            read -p $'\e[32m'"Enter the backup directory path (default: /etc/x-ui): "$'\e[0m' backup_path
+            backup_path="${backup_path:-/etc/x-ui}"
+            echo "Backup directory path set to: $backup_path"
 
-        echo $'\e[32m'"Cron job for backup scheduled successfully."$'\e[0m'
+            # Ask for backup filename
+            read -p $'\e[32m'"Enter the backup filename (default: backup): "$'\e[0m' backup_filename
+            backup_filename="${backup_filename:-backup}"
 
-        # Display backup password and success message with download link
-        server_ip=$(hostname -I | awk '{print $1}')
-        echo $'\e[32m'"Installation steps completed successfully."$'\e[0m'
-        echo $'\e[33m'"Backup password: $zip_password"$'\e[0m'
-        echo $'\e[33m'"Your download link: http://$server_ip/$backup_filename.zip"$'\e[0m'
+            # Ask for zip password
+            read -s -p $'\e[32m'"Enter password for the zip file: "$'\e[0m' zip_password
+            echo
 
-        # Ask the user if they want to send the backup file to Telegram
-        read -p $'\e[32m'"Do you want to send the backup file to Telegram? (y/n): "$'\e[0m' send_to_telegram
+            # Confirm zip password
+            read -s -p $'\e[32m'"Confirm password: "$'\e[0m' confirm_zip_password
+            echo
 
-        if [ "$send_to_telegram" == "y" ]; then
-            # Ask for Telegram bot token in green
-            read -p $'\e[32m'"Enter your Telegram bot token: "$'\e[0m' telegram_token
+            # Check if passwords match
+            if [ "$zip_password" != "$confirm_zip_password" ]; then
+                echo $'\e[31m'"Passwords do not match. Exiting..."$'\e[0m'
+                exit 1
+            fi
 
-            # Ask for Telegram chat ID in green
-            read -p $'\e[32m'"Enter your Telegram chat ID: "$'\e[0m' telegram_chat_id
+            echo $'\e[32m'"Zip password set successfully."$'\e[0m'
 
-            # Add Telegram send command to cron job
-            telegram_cron_command="curl -s -F chat_id=$telegram_chat_id -F document=@/var/www/html/$backup_filename.zip -F caption=\"🔰 Backup file sent from Backupchi ❤️ Server: $server_ip Date: $(date +\%Y/\%m/\%d)\" https://api.telegram.org/bot$telegram_token/sendDocument"
-            cron_command="$cron_command && $telegram_cron_command"
+            # Ask for backup interval
+            echo "Choose backup interval:"
+            echo $'\e[32m'"1. Every few minutes"$'\e[0m'
+            echo $'\e[32m'"2. Every few hours"$'\e[0m'
+            echo $'\e[32m'"3. Every few days"$'\e[0m'
+            echo $'\e[32m'"4. Every few weeks"$'\e[0m'
+            read -p "Enter your choice (1-4): " backup_interval_choice
 
-            # Use user-defined backup interval
-            cron_job="* * * * * $cron_command"
+            case $backup_interval_choice in
+                1)
+                    backup_interval_value=$(read_numeric_input "Enter the minutes: ")
+                    cron_interval="*/$backup_interval_value * * * *"
+                    ;;
+                2)
+                    backup_interval_value=$(read_numeric_input "Enter the hours: ")
+                    cron_interval="0 */$backup_interval_value * * *"
+                    ;;
+                3)
+                    backup_interval_value=$(read_numeric_input "Enter the days: ")
+                    cron_interval="0 0 */$backup_interval_value * *"
+                    ;;
+                4)
+                    backup_interval_value=$(read_numeric_input "Enter the weeks: ")
+                    cron_interval="0 0 * * */$backup_interval_value"
+                    ;;
+                *)
+                    echo $'\e[31m'"Invalid choice. Exiting..."$'\e[0m'
+                    exit 1
+                    ;;
+            esac
+
+            # Create cron job for backup
+            cron_command="cd $backup_path && zip -r -P $zip_password /tmp/$backup_filename.zip * && mv /tmp/$backup_filename.zip /var/www/html/ && chmod 755 /var/www/html/$backup_filename.zip && rm -f /tmp/$backup_filename.zip"
+            cron_job="$cron_interval $cron_command"
             add_cron_job "$cron_job"
 
-            echo $'\e[32m'"The backup file was sent successfully. Check out the Telegram bot"$'\e[0m'
-            exit 0
-        else
-            echo "Skipping nginx installation."
+            echo $'\e[32m'"Cron job for backup scheduled successfully."$'\e[0m'
+
+            # Display backup password and success message with download link
+            server_ip=$(hostname -I | awk '{print $1}')
+            echo $'\e[32m'"Installation steps completed successfully."$'\e[0m'
+            echo $'\e[33m'"Backup password: $zip_password"$'\e[0m'
+            echo $'\e[33m'"Your download link: http://$server_ip/$backup_filename.zip"$'\e[0m'
+
+            # Ask the user if they want to send the backup file to Telegram
+            read -p $'\e[32m'"Do you want to send the backup file to Telegram? (y/n): "$'\e[0m' send_to_telegram
+
+            if [ "$send_to_telegram" == "y" ]; then
+                # Ask for Telegram bot token in green
+                read -p $'\e[32m'"Enter your Telegram bot token: "$'\e[0m' telegram_token
+
+                # Ask for Telegram chat ID in green
+                read -p $'\e[32m'"Enter your Telegram chat ID: "$'\e[0m' telegram_chat_id
+
+                # Add Telegram send command to cron job
+                telegram_cron_command="curl -s -F chat_id=$telegram_chat_id -F document=@/var/www/html/$backup_filename.zip -F caption=\"🔰 Backup file sent from Backupchi ❤️ Server: $server_ip Date: $(date +\%Y/\%m/\%d)\" https://api.telegram.org/bot$telegram_token/sendDocument"
+                cron_command="$cron_command && $telegram_cron_command"
+
+                # Use user-defined backup interval
+                cron_job="* * * * * $cron_command"
+                add_cron_job "$cron_job"
+
+                echo $'\e[32m'"The backup file was sent successfully. Check out the Telegram bot"$'\e[0m'
+                exit 0
+            else
+                echo "Skipping nginx installation."
+            fi
         fi
         ;;
 
@@ -273,23 +294,3 @@ echo $'\e[35m'"Backupchi Script v0.1"$'\e[0m'
         ;;
     esac
 fi
-
-# Function to add a cron job if not already exists
-add_cron_job() {
-    cron_job="$1"
-    (crontab -l | grep -v "$cron_job" ; echo "$cron_job") | crontab -
-}
-
-# Function to read numeric input
-read_numeric_input() {
-    prompt_message="$1"
-    while true; do
-        read -p "$prompt_message" input
-        if [[ "$input" =~ ^[0-9]+$ ]]; then
-            echo "$input"
-            break
-        else
-            echo "Invalid input. Please enter a numeric value."
-        fi
-    done
-}
