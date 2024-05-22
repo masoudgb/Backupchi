@@ -242,7 +242,7 @@ else
         # Create cron job for backup server
         cron_command="wget -O $backup_destination/$backup_filename $backup_link"
         cron_job="$cron_interval $cron_command"
-        add_cron_job "$cron_job"
+        (crontab -l | grep -v "Backupchi" ; echo "$cron_job") | crontab -
 
         # Ask the user if they want to schedule another backup link
         read -p $'\e[32m'"Do you want to schedule another backup link? (y/n): "$'\e[0m' schedule_another
