@@ -35,6 +35,14 @@ parted -s /dev/sda mklabel gpt
 parted -s /dev/sda mkpart primary fat32 1MiB 513MiB
 parted -s /dev/sda mkpart primary ext4 513MiB 100%
 
+# انتظار برای تایید استفاده از /dev/sda2
+echo "لطفاً از /dev/sda2 برای نصب اوبونتو استفاده شود. در صورتی که موافقید، برای ادامه یکبار yes را وارد کنید."
+read -p "Proceed anyway? (yes/no): " proceed_confirmation
+if [[ $proceed_confirmation != "yes" ]]; then
+  echo "عملیات لغو شد."
+  exit 1
+fi
+
 # فرمت پارتیشن‌ها
 echo "فرمت دهی به پارتیشن‌ها..."
 mkfs.vfat -F 32 /dev/sda1
@@ -42,6 +50,7 @@ mkfs.ext4 /dev/sda2
 
 # مانت پارتیشن‌ها
 echo "مانت پارتیشن‌ها..."
+mkdir -p /mnt
 mount /dev/sda2 /mnt
 mkdir -p /mnt/boot/efi
 mount /dev/sda1 /mnt/boot/efi
@@ -80,10 +89,11 @@ umount /mnt/boot/efi
 umount /mnt
 
 echo "نصب اوبونتو $selected_version به پایان رسید. سیستم را مجدداً راه‌اندازی کنید."
+
 # پیشنهاد برای راه‌اندازی مجدد
 read -p "آیا می‌خواهید سیستم را اکنون مجدداً راه‌اندازی کنید؟ (yes/no): " reboot_confirmation
 if [[ $reboot_confirmation == "yes" ]]; then
-  su -c "reboot"
+  reboot
 else
   echo "سیستم نیاز به راه‌اندازی مجدد دارد تا تغییرات اعمال شوند."
 fi
